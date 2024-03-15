@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+}
+
+group 'com.scaleiq'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    implementation 'org.apache.kafka:kafka-clients:3.4.0'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/connect-api
+    implementation 'org.apache.kafka:connect-api:3.4.0'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/connect-transforms
+    compileOnly 'org.apache.kafka:connect-transforms:3.4.0'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/connect-file
+    compileOnly 'org.apache.kafka:connect-file:3.4.0'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/connect-json
+    implementation 'org.apache.kafka:connect-json:3.4.0'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation 'org.slf4j:slf4j-api:2.0.6'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation 'org.slf4j:slf4j-simple:2.0.6'
+
+    //https://search.maven.org/artifact/org.opensearch.client/opensearch-rest-high-level-client/1.2.4/jar
+    //implementation 'org.opensearch.client:opensearch-rest-high-level-client:1.2.4'
+
+    // https://mvnrepository.com/artifact/org.opensearch.client/opensearch-rest-high-level-client
+    implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.6.0'
+
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.scaleiq.processor.processor"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
