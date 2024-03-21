@@ -20,4 +20,5 @@ Requirements 1- Java 11->19 . The code has been compiled with GraalVM for Polygl
 
 
 ### Command to execute the processor
-java -Djavax.net.ssl.trustStore="/home/soundarya/cubescale/assessment/ssl-configs/mytruststore.jks" -Djavax.net.ssl.trustStorePassword=password123 -cp build/libs/processor-1.0-SNAPSHOT.jar: com.scaleiq.processor.stream.processor1
+java -Djavax.net.ssl.trustStore="/home/soundarya/cubescale/assessment/ssl-configs/mytruststore.jks" -Djavax.net.ssl.trustStorePassword=password123 \
+-cp build/libs/processor-1.0-SNAPSHOT.jar: com.scaleiq.processor.stream.processor1
