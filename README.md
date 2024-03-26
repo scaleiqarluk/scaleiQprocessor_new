@@ -23,3 +23,5 @@ $JAVA_HOME/lib/security/cacerts
 
 Please set the env variable JAVA_HOME if not set, and add the certificates to the Java trustStore
 Keystore password is set to 'scaleiq'.
+
+Test change
