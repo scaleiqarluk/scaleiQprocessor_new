@@ -1,7 +1,5 @@
 plugins {
     id 'java'
-    id 'net.linguica.maven-settings' version '0.5'
-    id 'maven-publish'
 }
 
 group 'com.scaleiq'
@@ -41,16 +39,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.9.0'
-}
-
-repositories{
-    maven {
-        url 'https://pkgs.dev.azure.com/ScaleiQ/_packaging/ScaleiQ/maven/v1'
-        name 'ScaleiQ'
-        authentication {
-            basic(BasicAuthentication)
-        }
-    }
 }
 
 test {
