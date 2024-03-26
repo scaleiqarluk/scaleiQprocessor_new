@@ -18,7 +18,8 @@ Requirements 1- Java 11->19 . The code has been compiled with GraalVM for Polygl
 
 8-To Stop the pakages, 'sudo systemctl stop ingestor', sudo systemctl stop processor'
 
+# Java Trust store path
+$JAVA_HOME/lib/security/cacerts
 
-### Command to execute the processor
-java -Djavax.net.ssl.trustStore="/home/soundarya/cubescale/assessment/ssl-configs/mytruststore.jks" -Djavax.net.ssl.trustStorePassword=password123 \
--cp build/libs/processor-1.0-SNAPSHOT.jar: com.scaleiq.processor.stream.processor1
+Please set the env variable JAVA_HOME if not set, and add the certificates to the Java trustStore
+Keystore password is set to 'scaleiq'.

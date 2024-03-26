@@ -6,8 +6,9 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -27,53 +28,47 @@ import org.opensearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
 public class processor1 {
 
-    public static RestHighLevelClient createOpenSearchClient() {
-        String connString = "https://admin:admin@localhost:9200";
+    public static RestHighLevelClient createOpenSearchClient() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
+        String java_path = System.getenv("JAVA_HOME");
 
-        //Point to keystore with appropriate certificates for security.
+        FileInputStream is = new FileInputStream(java_path+"/lib/security/cacerts");
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        String password = "scaleiq";
+        ks.load(is, password.toCharArray());
 
-        // Commented these properties because I am setting it from command line while executing the class
-        // ------------------
-        /*
-        System.setProperty("javax.net.ssl.trustStore", "/home/soundarya/cubescale/assessment/ssl-configs/mytruststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "password123");
-        */
+        SSLContext sslContext = SSLContextBuilder.create()
+                .loadKeyMaterial(ks, password.toCharArray())
+                .loadTrustMaterial(new TrustSelfSignedStrategy())
+                .build();
 
-        // we build a URI from the connection string
-        RestHighLevelClient restHighLevelClient;
+        // credentials for Opensearch dashboard is admin:myPass2403
+        String connString = "https://admin:myPass2403@localhost:9200";
         URI connUri = URI.create(connString);
-        // extract login information if it exists
         String userInfo = connUri.getUserInfo();
+        String[] auth = userInfo.split(":");
 
-        if (userInfo == null) {
-            // REST client without security
-            restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost(connUri.getHost(), connUri.getPort(), "http")));
+        CredentialsProvider cp = new BasicCredentialsProvider();
+        cp.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(auth[0], auth[1]));
 
-        } else {
-            // REST client with security
-            String[] auth = userInfo.split(":");
-
-            CredentialsProvider cp = new BasicCredentialsProvider();
-            cp.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(auth[0], auth[1]));
-
-            restHighLevelClient = new RestHighLevelClient(
-                    RestClient.builder(new HttpHost(connUri.getHost(), connUri.getPort(), connUri.getScheme()))
-                            .setHttpClientConfigCallback(
-                                    httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(cp)
-                                            .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())));
-
-
-        }
-
-        return restHighLevelClient;
+        // Create RestHighLevelClient with SSL context
+        RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(new HttpHost(connUri.getHost(), connUri.getPort(), connUri.getScheme()))
+                        .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                                .setSSLContext(sslContext)
+                                .setDefaultCredentialsProvider(cp)));
+        return client;
     }
 
     private static KafkaConsumer<String, String> createKafkaConsumer(){
@@ -108,7 +103,7 @@ public class processor1 {
                 .getAsString();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
         Logger log = LoggerFactory.getLogger(processor1.class.getSimpleName());
 
