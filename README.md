@@ -22,6 +22,6 @@ Requirements 1- Java 11->19 . The code has been compiled with GraalVM for Polygl
 $JAVA_HOME/lib/security/cacerts
 
 Please set the env variable JAVA_HOME if not set, and add the certificates to the Java trustStore
-Keystore password is set to 'scaleiq'.
+Keystore password is set to 'changeit'.
 
 Test change

@@ -46,7 +46,7 @@ public class processor0 {
 
         FileInputStream is = new FileInputStream(java_path+"/lib/security/cacerts");
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        String password = "scaleiq";
+        String password = "changeit";
         ks.load(is, password.toCharArray());
 
         SSLContext sslContext = SSLContextBuilder.create()
